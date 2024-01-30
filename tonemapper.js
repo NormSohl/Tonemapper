@@ -106,7 +106,7 @@ function HandleMIDI(event) {
 
         case NoteOn:
             CurrentPitch = scale(event.value);
-            SendMicrotone();
+            SendMicrotone(event);
             break;
 
         case NoteOff:
@@ -114,11 +114,28 @@ function HandleMIDI(event) {
             event.send();
             break;
 
+        case PitchBend:
+            ExternalPitchBend = event.value;
+            SendPitchbend();
+            break;
+
+        default:
+            event.send(); // pass all other values
 
     }
 
-function SendMicrotone(){
+function SendPitchBend (){
+    // calculate pitchbend
 
+    // send pitchbend
+
+
+}
+
+function SendMicrotone(event){
+    SendPitchBend();
+    event.value = PitchCenter;
+    note.send();
 
 
 }
@@ -131,11 +148,6 @@ function SendMicrotone(){
     }
 }
 
-Excerpt From
-Logic Pro Effects
-Apple Inc.
-https://books.apple.com/us/book/logic-pro-effects/id960808317
-This material may be protected by copyright.
 
 Program:
 Experiment with Initialize to send messages to Initialize midi pitchbend range to -1.to +1.5 octave (18 semitones). If that does not work, add initial to  processMIDI.
