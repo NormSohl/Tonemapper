@@ -123,6 +123,7 @@ function HandleMIDI(event) {
             event.send(); // pass all other values
 
     }
+}
 
 function SendPitchBend (){
     // calculate pitchbend
@@ -130,10 +131,8 @@ function SendPitchBend (){
     // send pitchbend
     var pb = new PitchBend;   /* make a new pitch bend event */
     pb.channel = 0 /* send messages to MIDI Channel 0 */ 
-    pb.value = 0;   /* set its pitch bend to center position (0). -8192–8191. A value of 0 is center  */ 
-    pb.send();    /* send the pitch Ben value */”.
-    
-
+    pb.value = 0;   /* set its pitch bend to center position (0). -8192 to 8191. A value of 0 is center  */ 
+    pb.send();    /* send the pitch Ben value */
 }
 
 function SendMicrotone(event){
