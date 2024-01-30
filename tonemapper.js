@@ -5,7 +5,7 @@ var PitchCenter = 60; /* middle c */
 // ) a Map to contain the scale
 // diatonic scale (white notes) 0,2,4,5,7,9,11  
 const scale = new Map([
-//MIDI note, pb value  
+//MIDI note, pb value  TBD calculate scale and enter. use 12 tone edo for test
 	[0 + 24, -1],
 	[2 + 24, -1],
 	[4 + 24, -1],
@@ -109,17 +109,19 @@ function HandleMIDI(event) {
             break;
 
         case NoteOff:
-            event.value = PitchCenter;
-            event.send();
+			if (scale.has(event.value)){
+          	  event.value = PitchCenter;
+        	    event.send();
+			}
             break;
 
         case PitchBend:
             ExternalPitchBend = event.value;
-            SendPitchbend();
+            SendPitchBend();
             break;
 
         default:
-            event.send(); // pass all other values
+            event.send(); // pass all other messages
     }
 }
 
@@ -127,7 +129,7 @@ function SendPitchBend (channel){
     // calculate pitchbend
 	var NewPB;
 	if (ExternalPitchBend < 0){
-		var range = ExternalPitchBend / -8192; //range is a value of 0 to -1
+		var range = ExternalPitchBend / -8192; //range is a value of almost 0 to -1
 		var AdjustedRange = LowerRange * range;
 		NewPB = AdjustedRange + CurrentPitch;
 	}
