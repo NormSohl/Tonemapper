@@ -52,7 +52,7 @@ const scale = new Map([
 	[5 + 84, 1],
 	[7 + 84, 1],
 	[9 + 84, 1],
-	[11 + 84, 1]
+	[11 + 84, 1],
 	]);
 	
 //Current external pitchbend (regular midi pitchbend input)
@@ -128,7 +128,11 @@ function SendPitchBend (){
     // calculate pitchbend
 
     // send pitchbend
-
+    var pb = new PitchBend;   /* make a new pitch bend event */
+    pb.channel = 0 /* send messages to MIDI Channel 0 */ 
+    pb.value = 0;   /* set its pitch bend to center position (0). -8192–8191. A value of 0 is center  */ 
+    pb.send();    /* send the pitch Ben value */”.
+    
 
 }
 
@@ -136,35 +140,22 @@ function SendMicrotone(event){
     SendPitchBend();
     event.value = PitchCenter;
     note.send();
-
-
-}
-    
-
-    if (event instanceof Note) {  
-        /* if it is a note */
-        event.pitch += 12; /* transpose up one octave */
-        event.sendAfterMilliseconds(100);  /* send after delay */ 
-    }
 }
 
+//Program:
+//Experiment with Initialize to send messages to Initialize midi pitchbend range to -1.to +1.5 octave (18 semitones). If that does not work, add initial to  processMIDI.
+//Use switch toFilter for
+//Note on
+//	Convert note number to microtonal pitchbend using table
+//	Set adjacent pitchbend ranges.
+//	Scale external pitchbend value to fit scale using adjacent pitchbend range, add or subtract to table value
+//	Send pitchbend data then send note on using center of scale. Always the same note value, but use input velocity.
+//Note off
+//	Send note off for center of scale, use input velocity.
+//Pitchbend
+//	Set current pitchbend value global. 
+///	Scale based on adjacent pitchbend range
+//	Combine with current microtonal value
+//	Send pitchbend message with combined value
 
-Program:
-Experiment with Initialize to send messages to Initialize midi pitchbend range to -1.to +1.5 octave (18 semitones). If that does not work, add initial to  processMIDI.
-Use switch toFilter for
-Note on
-	Convert note number to microtonal pitchbend using table
-	Set adjacent pitchbend ranges.
-	Scale external pitchbend value to fit scale using adjacent pitchbend range, add or subtract to table value
-	Send pitchbend data then send note on using center of scale. Always the same note value, but use input velocity.
-Note off
-	Send note off for center of scale, use input velocity.
-Pitchbend
-	Set current pitchbend value global. 
-	Scale based on adjacent pitchbend range
-	Combine with current microtonal value
-	Send pitchbend message with combined value
-
-Default: Pass all other messages unchanged.
-	
-
+//Default: Pass all other messages unchanged.
