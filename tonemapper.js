@@ -1,6 +1,6 @@
 /* Microtonal filter */
 
-var PitchleCenter = 60; /* middle c */
+var PitchCenter = 60; /* middle c */
 
 // ) a Map to contain the scale
 // diatonic scale (white notes) 0,2,4,5,7,9,11  
@@ -59,13 +59,13 @@ const scale = new Map([
 var ExternalPitchBend = 0;
 
 //Current microtonal scale value in pitchbend (value that determines microtonal pitch output when added to scaled external pitchbend)
-var CurrentPitch = 0;
+//var CurrentPitch = 0;
 
 //Adjacent upper pitchbend range for current microtonal scale value. (+1 scale value, deal with scale overflow by clipping)
-var LowerRange = 0;
+var UpperRange = 0;
 
 //Adjacent lower pitchbend range for current microtonal scale value.  (-1 scale value, deal with scale overflow by clipping)
-var UpperRange = 0;
+var LowerRange = 0;
 
 function Initialize(){
 	var cc = new ControlChange;   /* make a new ControlChange event*/
@@ -105,7 +105,6 @@ function HandleMIDI(event) {
     switch (event){
 
         case NoteOn:
-            CurrentPitch = scale(event.value);
             SendMicrotone(event);
             break;
 
@@ -121,24 +120,55 @@ function HandleMIDI(event) {
 
         default:
             event.send(); // pass all other values
-
     }
 }
 
-function SendPitchBend (){
+function SendPitchBend (channel){
     // calculate pitchbend
+	var NewPB;
+	if (ExternalPitchBend < 0){
+		var range = ExternalPitchBend / -8192; //range is a value of 0 to -1
+		var AdjustedRange = LowerRange * range;
+		NewPB = AdjustedRange + CurrentPitch;
+	}
+	
+	else {
+		var range = ExternalPitchBend / 8192; //range is a value of 0 to 1
+		var AdjustedRange = UpperRange * range;
+		NewPB = AdjustedRange + CurrentPitch;
+	}
 
     // send pitchbend
     var pb = new PitchBend;   /* make a new pitch bend event */
-    pb.channel = 0 /* send messages to MIDI Channel 0 */ 
-    pb.value = 0;   /* set its pitch bend to center position (0). -8192 to 8191. A value of 0 is center  */ 
+    pb.channel = channel; /* send messages to MIDI Channel 0 */ 
+    pb.value = NewPB;
     pb.send();    /* send the pitch Ben value */
 }
 
 function SendMicrotone(event){
-    SendPitchBend();
-    event.value = PitchCenter;
-    note.send();
+	if (scale.has(event.value)){
+		CurrentPitch = scale(event.value);
+	
+		// calculate UpperRange
+		if (scale.has(event.value+1)){
+			UpperRange = scale(event.value + 1) - CurrentPitch;
+		}
+		else{
+			UpperRange = 0;
+		}
+
+		// calculate LowerRange
+		if (scale.has(event.value - 1)){
+			LowerRange = CurrentPitch - scale(event.value -1)
+		}
+		else{
+			LowerRange = 0;
+		}
+
+	    SendPitchBend(event.channel);
+ 	   event.value = PitchCenter;
+ 	   note.send();
+	} //else discard the message, MIDI note is out of range
 }
 
 //Program:
